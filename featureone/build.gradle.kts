@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlin.android)
 }
 
@@ -8,13 +8,10 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.abkhare.featureone"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {

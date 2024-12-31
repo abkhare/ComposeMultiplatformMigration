@@ -12,9 +12,12 @@ fun AppNavigation(
 ) {
     val navigator = rememberNavController()
     NavHost(
-        startDestination = NavigationRoute.FeatureOne,
+        startDestination = NavigationRoute.Home.toString(),
         navController = navigator
     ) {
+        composable(route = NavigationRoute.Home.toString()) {
+            HomeScreen()
+        }
         composable(route = NavigationRoute.FeatureOne.toString()) {
             FeatureOneScreen()
         }
