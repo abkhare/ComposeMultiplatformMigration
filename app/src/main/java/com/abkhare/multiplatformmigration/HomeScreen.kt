@@ -1,6 +1,7 @@
 package com.abkhare.multiplatformmigration
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,14 +18,22 @@ import androidx.compose.ui.unit.dp
 
 @Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navigateToModuleOne: () -> Unit = {},
+    navigateToModuleTwo: () -> Unit = {},
+    navigateToModuleThree: () -> Unit = {}
+) {
     Column(
         modifier = Modifier.fillMaxSize().background(Color.LightGray),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
-            modifier = Modifier.size(200.dp, 100.dp),
+            modifier = Modifier
+                .size(200.dp, 100.dp)
+                .clickable {
+                    navigateToModuleOne()
+                },
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
@@ -36,7 +45,11 @@ fun HomeScreen() {
             }
         }
         Card(
-            modifier = Modifier.size(200.dp, 100.dp),
+            modifier = Modifier
+                .size(200.dp, 100.dp)
+                .clickable {
+                    navigateToModuleTwo()
+                },
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
@@ -48,7 +61,11 @@ fun HomeScreen() {
             }
         }
         Card(
-            modifier = Modifier.size(200.dp, 100.dp),
+            modifier = Modifier
+                .size(200.dp, 100.dp)
+                .clickable {
+                    navigateToModuleThree()
+                },
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(

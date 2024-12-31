@@ -7,4 +7,6 @@ sealed class NavigationRoute {
     data object FeatureOne : NavigationRoute()
 
     data object FeatureTwo : NavigationRoute()
+
+    data object FeatureThree : NavigationRoute()
 }
