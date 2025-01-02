@@ -26,13 +26,19 @@ fun AppNavigation(
             )
         }
         composable(route = NavigationRoute.FeatureOne.toString()) {
-            FeatureOneScreen()
+            FeatureOneScreen {
+                navigator.navigateUp()
+            }
         }
         composable(route = NavigationRoute.FeatureTwo.toString()) {
-            FeatureTwoScreen()
+            FeatureTwoScreen {
+                navigator.navigateUp()
+            }
         }
         composable(route = NavigationRoute.FeatureThree.toString()) {
-            FeatureThreeScreen()
+            FeatureThreeScreen {
+                navigator.navigateUp()
+            }
         }
     }
 }
