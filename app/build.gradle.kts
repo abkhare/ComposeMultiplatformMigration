@@ -1,8 +1,12 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 android {
@@ -32,28 +36,65 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+}
+
+kotlin {
+
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
-    buildFeatures {
-        compose = true
+
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "app"
+            isStatic = true
+        }
+    }
+
+    jvm("desktop")
+
+    sourceSets {
+        val desktopMain by getting
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+        }
+        commonMain.dependencies {
+            implementation(project(":FeatureOne"))
+            implementation(project(":FeatureTwo"))
+            implementation(project(":FeatureThree"))
+            implementation(compose.materialIconsExtended)
+            implementation(compose.ui)
+            implementation(compose.animationGraphics)
+            implementation(compose.material3)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.animation)
+            implementation(libs.navigation)
+        }
+        iosMain.dependencies {
+
+        }
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
+        }
+        wasmJsMain.dependencies {
+
+        }
     }
 }
 
-dependencies {
 
-    implementation(project(":FeatureOne"))
-    implementation(project(":FeatureTwo"))
-    implementation(project(":FeatureThree"))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.compose)
+dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,4 +102,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+compose.desktop {
+    application {
+        mainClass = "com.khareab.multiplatform.sample.MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "com.khareab.multiplatform.sample"
+            packageVersion = "1.0.0"
+        }
+    }
 }
