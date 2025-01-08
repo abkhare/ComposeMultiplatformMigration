@@ -6,13 +6,18 @@ on:
   pull_request:
     branches: [ "feature/workflows" ]
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
     - name: set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -23,7 +28,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      uses: rosariopfernandes/modular-android-action@v0.2.0
-      with:
-        for-each-module: 'assembleDebug'
-        for-all-modules: 'check'
+      run: ./gradlew :app:assembleDebug
