@@ -86,3 +86,24 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew :app:assembleDebug
 
+      - name: Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          release_name: Release v.${{ env.VERSION_NAME }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Upload Release APK
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: app/build/outputs/apk/release/app-debug.apk
+          asset_name: signed-artifact.apk
+          asset_content_type: application/zip
+
