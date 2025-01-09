@@ -1,3 +1,81 @@
+
+# Workflow name
+#name: Release App
+#
+## When it will be triggered
+#on:
+#  push:
+#      branches: [ "feature/workflows" ]
+#  pull_request:
+#      branches: [ "feature/workflows" ]
+#
+## Where it will run
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Fetch Sources
+#        uses: actions/checkout@v3
+#        with:
+#          # Number of commits to fetch. 0 indicates all history for all branches and tags.
+#          fetch-depth: 0
+#
+#      - name: Setup JDK
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'zulu'
+#          java-version: '17'
+#
+#          # Cache Gradle dependencies and Gradle Wrapper
+#      - name: Setup Gradle Cache
+#        uses: actions/cache@v3
+#        with:
+#          path: |
+#            ~/.gradle/caches
+#            ~/.gradle/wrapper
+#          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+#
+#      - name: Make gradlew executable
+#        run: chmod +x ./gradlew
+#
+#      - name: Generate App Version Name
+#        run: echo "VERSION_NAME=$(git describe --tags | sed 's/\(.*\)-/\1./' | sed 's/\(.*\)-/\1+/')" >> $GITHUB_ENV
+#
+#      - name: Bump Version
+#        uses: chkfung/android-version-actions@v1.1
+#        with:
+#          gradlePath: app/build.gradle.kts
+#          versionCode: ${{ github.run_number }}
+#          versionName: ${{ env.VERSION_NAME }}
+#
+#      - name: Build with Gradle
+#        run: ./gradlew :app:assembleDebug
+#
+#      - name: Release
+#        id: create_release
+#        uses: actions/create-release@v1
+#        with:
+#          tag_name: "${{ steps.get_tag.outputs.version }}"
+#          release_name: Release v.${{ env.VERSION_NAME }}
+#          draft: false
+#          prerelease: false
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+#
+#      - name: Upload Release APK
+#        id: upload_release_asset
+#        uses: actions/upload-release-asset@v1.0.1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: app/build/outputs/apk/release/app-debug.apk
+#          asset_name: signed-artifact.apk
+#          asset_content_type: application/zip
+
+#-----------------------------------------------------------------------------------------------
+
 #name: Android CI
 #
 #on:
@@ -15,96 +93,64 @@
 #    runs-on: ubuntu-latest
 #
 #    steps:
-#    - uses: actions/checkout@v3
-#      with:
-#        submodules: true
-#        fetch-depth: 0
-#        token: ${{ secrets.PAT_TOKEN }}
-#    - name: set up JDK 17
-#      uses: actions/setup-java@v4
-#      with:
-#        java-version: '17'
-#        distribution: 'temurin'
-#        cache: gradle
+#      - uses: actions/checkout@v3
+#        with:
+#          submodules: true
+#          fetch-depth: 0
+#          token: ${{ secrets.PAT_TOKEN }}
+#      - name: set up JDK 17
+#        uses: actions/setup-java@v4
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin'
+#          cache: gradle
 #
-#    - name: Grant execute permission for gradlew
-#      run: chmod +x gradlew
-#    - name: Build with Gradle
-#      run: ./gradlew :app:assembleDebug
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew
+#      - name: Build with Gradle
+#        run: ./gradlew :app:assembleDebug
 
 
-# Workflow name
-name: Release App
+##-----------------------------------------------------------------------------------------------
 
-# When it will be triggered
+name: Android CI
+
 on:
   push:
-      branches: [ "feature/workflows" ]
+    branches: [ "feature/workflows" ]
   pull_request:
-      branches: [ "feature/workflows" ]
+    branches: [ "feature/workflows" ]
 
-# Where it will run
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  prepare_deploy:
+    runs-on: ubuntu-22.04
     steps:
-      - name: Fetch Sources
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
-          # Number of commits to fetch. 0 indicates all history for all branches and tags.
           fetch-depth: 0
-
-      - name: Setup JDK
-        uses: actions/setup-java@v3
+      - name: Set env
+        id: last_tag
+        run: echo "LAST_TAG=$(git tag --sort=committerdate | tail -1)" >> $GITHUB_OUTPUT
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
+          level: patch
+      - run: |
+          git config user.name abkhare
+          git config user.email abhiraj.khare100@gmail.com
+          git tag ${{ steps.bump-semver.outputs.new_version }}
+          git push --tags
+      - name: "Set output"
+        id: set-output
+        run: |
+          echo "multiplat_mobile_version_name=${{ steps.bump-semver.outputs.new_version }}" >> $GITHUB_OUTPUT
 
-          # Cache Gradle dependencies and Gradle Wrapper
-      - name: Setup Gradle Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+          IFS='.' read -r major minor patch <<< "${{ steps.bump-semver.outputs.new_version }}"
+          multiplat_mobile_version_code=$((major * 10000 + minor * 100 + patch))
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Generate App Version Name
-        run: echo "VERSION_NAME=$(git describe --tags | sed 's/\(.*\)-/\1./' | sed 's/\(.*\)-/\1+/')" >> $GITHUB_ENV
-
-      - name: Bump Version
-        uses: chkfung/android-version-actions@v1.1
-        with:
-          gradlePath: app/build.gradle.kts
-          versionCode: ${{ github.run_number }}
-          versionName: ${{ env.VERSION_NAME }}
-
-      - name: Build with Gradle
-        run: ./gradlew :app:assembleDebug
-
-      - name: Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: "${{ steps.get_tag.outputs.version }}"
-          release_name: Release v.${{ env.VERSION_NAME }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-
-      - name: Upload Release APK
-        id: upload_release_asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: app/build/outputs/apk/release/app-debug.apk
-          asset_name: signed-artifact.apk
-          asset_content_type: application/zip
-
+          echo "multiplat_mobile_version_code=${multiplat_mobile_version_code}" >> $GITHUB_OUTPUT
+      - name: "Print output"
+        run: |
+          echo -e "Version name is: \n ${{ steps.set-output.outputs.multiplat_mobile_version_name }}"
+          echo -e "Version code is: \n ${{ steps.set-output.outputs.multiplat_mobile_version_code }}
