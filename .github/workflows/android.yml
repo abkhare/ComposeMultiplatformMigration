@@ -135,8 +135,8 @@ jobs:
         id: bump-semver
         with:
           current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
-          # A semver update level {major, premajor, minor, preminor, patch, prepatch, prerelease}.
-          level: prerelease
+          # A semver update level {major, minor, patch}.
+          level: patch
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
