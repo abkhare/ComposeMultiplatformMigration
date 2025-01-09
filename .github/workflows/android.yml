@@ -128,14 +128,13 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions-ecosystem/action-get-latest-tag@v1
-        id: get-latest-tag
-
+      - name: Set env
+        id: last_tag
+        run: echo "LAST_TAG=$(git tag --sort=committerdate | tail -1)" >> $GITHUB_OUTPUT
       - uses: actions-ecosystem/action-bump-semver@v1
         id: bump-semver
         with:
-          current_version: ${{ steps.get-latest-tag.outputs.tag }}
-          level: patch
+          current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
