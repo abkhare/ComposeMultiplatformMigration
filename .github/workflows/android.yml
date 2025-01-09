@@ -136,7 +136,7 @@ jobs:
         with:
           current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
           # A semver update level {major, premajor, minor, preminor, patch, prepatch, prerelease}.
-          level: prerelease
+          level: patch
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
@@ -167,3 +167,24 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew :app:assembleDebug
+
+      - name: GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          release_name: Release v.${{ steps.set-output.outputs.multiplat_mobile_version_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Upload Release APK
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: app/build/outputs/apk/release/app-debug.apk
+          asset_name: signed-artifact.apk
+          asset_content_type: application/zip
