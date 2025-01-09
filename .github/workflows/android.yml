@@ -136,14 +136,11 @@ jobs:
         with:
           current_version: ${{ steps.get-latest-tag.outputs.tag }}
           level: minor
-      - run: |
-          git config user.name abkhare
-          git config user.email abhiraj.khare100@gmail.com
-          git tag ${{ steps.bump-semver.outputs.new_version }}
-          git push --tags
+
+      - uses: actions-ecosystem/action-push-tag@v1
         with:
-        env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          tag: ${{ steps.bump-semver.outputs.new_version }}
+          message: '${{ steps.bump-semver.outputs.new_version }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}'
       - name: "Set output"
         id: set-output
         run: |
