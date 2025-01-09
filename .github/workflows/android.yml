@@ -59,10 +59,8 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
           # Cache Gradle dependencies and Gradle Wrapper
       - name: Setup Gradle Cache
         uses: actions/cache@v3
