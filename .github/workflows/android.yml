@@ -135,8 +135,8 @@ jobs:
         id: bump-semver
         with:
           current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
-          # A semver update level {major, minor, patch}.
-          level: patch
+          # A semver update level {major, premajor, minor, preminor, patch, prepatch, prerelease}.
+          level: prerelease
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
@@ -155,3 +155,15 @@ jobs:
         run: |
           echo -e "Version name is: \n ${{ steps.set-output.outputs.multiplat_mobile_version_name }}"
           echo -e "Version code is: \n ${{ steps.set-output.outputs.multiplat_mobile_version_code }}"
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew :app:assembleDebug
