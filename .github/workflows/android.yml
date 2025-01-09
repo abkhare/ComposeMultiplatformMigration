@@ -88,10 +88,9 @@ jobs:
 
       - name: Release
         id: create_release
-        tag_name: first_release
         uses: actions/create-release@v1
         with:
-          release_name: Release v.${{ env.VERSION_NAME }}
+          release_name: Release
           draft: false
           prerelease: false
         env:
