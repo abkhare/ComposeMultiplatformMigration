@@ -118,8 +118,6 @@ name: Android CI
 on:
   push:
     branches: [ "feature/workflows" ]
-  pull_request:
-    branches: [ "feature/workflows" ]
 
 jobs:
   prepare_deploy:
@@ -173,7 +171,7 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: ${{ steps.set-output.outputs.multiplat_mobile_version_name }}
-          release_name: Release v.${{ steps.set-output.outputs.multiplat_mobile_version_name }}
+          release_name: Android Release .${{ steps.set-output.outputs.multiplat_mobile_version_name }}
           body: |
             Changes in this Release
             - First Change
