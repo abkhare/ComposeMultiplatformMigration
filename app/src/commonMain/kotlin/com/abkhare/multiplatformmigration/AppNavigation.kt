@@ -5,9 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.abkhare.featureone.FeatureOneScreen
-import com.abkhare.featurethree.FeatureThreeScreen
-import com.abkhare.featuretwo.FeatureTwoScreen
 
 @Composable
 fun AppNavigation(
@@ -26,19 +23,19 @@ fun AppNavigation(
             )
         }
         composable(route = NavigationRoute.FeatureOne.toString()) {
-            FeatureOneScreen {
+            /*FeatureOneScreen {
                 navigator.navigateUp()
-            }
+            }*/
         }
         composable(route = NavigationRoute.FeatureTwo.toString()) {
-            FeatureTwoScreen {
+            /*FeatureTwoScreen {
                 navigator.navigateUp()
-            }
+            }*/
         }
         composable(route = NavigationRoute.FeatureThree.toString()) {
-            FeatureThreeScreen {
+            /*FeatureThreeScreen {
                 navigator.navigateUp()
-            }
+            }*/
         }
     }
 }
