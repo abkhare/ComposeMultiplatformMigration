@@ -141,6 +141,8 @@ jobs:
           git config user.email abhiraj.khare100@gmail.com
           git tag ${{ steps.bump-semver.outputs.new_version }}
           git push --tags
+        env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       - name: "Set output"
         id: set-output
         run: |
