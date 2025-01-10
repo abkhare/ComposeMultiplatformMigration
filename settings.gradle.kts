@@ -26,6 +26,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "MultiplatformMigration"
 include(":app")
-include(":FeatureOne")
-include(":FeatureTwo")
-include(":FeatureThree")
+include(":featureone")
+include(":featuretwo")
+include(":featurethree")

@@ -66,9 +66,9 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-//            implementation(project(":FeatureOne"))
-//            implementation(project(":FeatureTwo"))
-//            implementation(project(":FeatureThree"))
+            implementation(project(":featureone"))
+            implementation(project(":featuretwo"))
+            implementation(project(":featurethree"))
             implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.animationGraphics)
