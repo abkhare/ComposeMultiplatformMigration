@@ -91,5 +91,5 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
           packageName: com.abhi.dynamicfeatures.ondemand
           releaseFiles: app/build/outputs/apk/debug/app-debug.apk
-          track: qa
+          track: alpha
           status: completed
