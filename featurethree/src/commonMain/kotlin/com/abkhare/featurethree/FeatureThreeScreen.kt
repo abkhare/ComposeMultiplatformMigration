@@ -12,6 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import multiplatformmigration.featurethree.generated.resources.Res
+import multiplatformmigration.featurethree.generated.resources.back
+import multiplatformmigration.featurethree.generated.resources.description
+import multiplatformmigration.featurethree.generated.resources.title
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,12 +28,12 @@ fun FeatureThreeScreen(navigateBack: () -> Unit) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        text = "Feature Three"
+                        text = stringResource(Res.string.title)
                     )
                 },
                 navigationIcon = {
                     Button(navigateBack) {
-                        Text("Back")
+                        Text(stringResource(Res.string.back))
                     }
                 }
             )
@@ -38,7 +43,7 @@ fun FeatureThreeScreen(navigateBack: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("From Feature Three Module")
+            Text(stringResource(Res.string.description))
         }
     }
 }
