@@ -12,7 +12,7 @@ permissions:
   contents: write # to fetch code (actions/checkout), push tag
 
 jobs:
-  android_deploy:
+  android_pr_merge_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -68,6 +68,8 @@ jobs:
           release_name: Android Release ${{ steps.set-output.outputs.mobile_version_name }}
           body: |
             ${{ github.event.pull_request.body }}
+            Actor
+            ${{ github.event.actor.login }}
           draft: false
           prerelease: false
         env:
