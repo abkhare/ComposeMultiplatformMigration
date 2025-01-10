@@ -12,6 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import multiplatformmigration.featureone.generated.resources.Res
+import multiplatformmigration.featureone.generated.resources.back
+import multiplatformmigration.featureone.generated.resources.description
+import multiplatformmigration.featureone.generated.resources.title
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,12 +28,12 @@ fun FeatureOneScreen(navigateBack: () -> Unit) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        text = "Feature One"
+                        text = stringResource(Res.string.title)
                     )
                 },
                 navigationIcon = {
                     Button(navigateBack) {
-                        Text("Back")
+                        Text(stringResource(Res.string.back))
                     }
                 }
             )
@@ -38,7 +43,7 @@ fun FeatureOneScreen(navigateBack: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("From Feature One Module")
+            Text(stringResource(Res.string.description))
         }
     }
 

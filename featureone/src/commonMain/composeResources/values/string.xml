@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title">Feature One</string>
+    <string name="description">From Feature One Module</string>
+    <string name="back">Back</string>
+</resources>
