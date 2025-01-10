@@ -118,6 +118,8 @@ name: Android CI
 on:
   push:
     branches: [ "feature/workflows" ]
+  pull_request:
+      branches: [ "feature/workflows" ]
 
 jobs:
   prepare_deploy:
