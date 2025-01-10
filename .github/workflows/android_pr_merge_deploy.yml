@@ -32,7 +32,7 @@ jobs:
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
-          git tag ${{ steps.bump-semver.outputs.new_version }}
+          git tag Android PR ${{ steps.bump-semver.outputs.new_version }}
           git push --tags
       - name: "Set output"
         id: set-output
@@ -65,11 +65,9 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: ${{ steps.set-output.outputs.mobile_version_name }}
-          release_name: Android Release ${{ steps.set-output.outputs.mobile_version_name }}
+          release_name: Android PR ${{ steps.set-output.outputs.mobile_version_name }}
           body: |
             ${{ github.event.pull_request.body }}
-            Actor
-            ${{ github.event.actor.login }}
           draft: false
           prerelease: false
         env:
@@ -83,5 +81,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: app/build/outputs/apk/debug/app-debug.apk
-          asset_name: signed-artifact.apk
+          asset_name: andoid-artifact-${{ steps.set-output.outputs.mobile_version_name }}.apk
           asset_content_type: application/zip
