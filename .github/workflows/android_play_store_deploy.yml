@@ -63,30 +63,25 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew :app:assembleDebug
+        run: ./gradlew :app:bundleRelease
 
-      - name: GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
+      - uses: r0adkll/sign-android-release@v1
+        name: "Sign app aab file"
+        id: sign_app
         with:
-          tag_name: ${{ steps.set-output.outputs.mobile_version_name }}
-          release_name: Android Release .${{ steps.set-output.outputs.mobile_version_name }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
-          draft: false
-          prerelease: false
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
+          alias: ${{ secrets.ANDROID_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          BUILD_TOOLS_VERSION: "30.0.2"
 
-      - name: Upload Release APK
-        id: upload_release_asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      - name: "Upload to Google Play"
+        uses: r0adkll/upload-google-play@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: app/build/outputs/apk/debug/app-debug.apk
-          asset_name: signed-artifact.apk
-          asset_content_type: application/zip
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.abkhare.multiplatformmigration
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: alpha
+          status: completed
