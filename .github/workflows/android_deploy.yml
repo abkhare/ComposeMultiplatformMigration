@@ -30,8 +30,8 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ APP_VERSION_NAME }}
-          release_name: Android Release .${{ APP_VERSION_NAME }}
+          tag_name: ${{ env.APP_VERSION_NAME }}
+          release_name: Android Release .${{ env.APP_VERSION_NAME }}
           body: |
             Changes in this Release
             - First Change
