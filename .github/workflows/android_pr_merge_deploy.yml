@@ -24,9 +24,6 @@ jobs:
         id: last_tag
         run: |
           echo "LAST_TAG=$(git tag --sort=committerdate | tail -1)" >> $GITHUB_OUTPUT
-          if [ "${{ steps.last_tag.outputs.LAST_TAG }}" == '' ]; then
-          echo "LAST_TAG=0.0.0" >> $GITHUB_OUTPUT;
-          fi
       - uses: actions-ecosystem/action-bump-semver@v1
         id: bump-semver
         with:
@@ -36,7 +33,7 @@ jobs:
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
-          git tag android_PR_Tag_${{ steps.bump-semver.outputs.new_version }}
+          git tag ${{ steps.bump-semver.outputs.new_version }}
           git push --tags
       - name: "Set output"
         id: set-output
