@@ -23,8 +23,10 @@ jobs:
       - name: Set env
         id: last_tag
         run: |
-          echo "LAST_TAG=0.0.0" >> $GITHUB_OUTPUT
           echo "LAST_TAG=$(git tag --sort=committerdate | tail -1)" >> $GITHUB_OUTPUT
+          if [ "${{ LAST_TAG }}" == '' ]; then
+          echo "LAST_TAG=0.0.0" >> $GITHUB_OUTPUT;
+          fi
       - uses: actions-ecosystem/action-bump-semver@v1
         id: bump-semver
         with:
