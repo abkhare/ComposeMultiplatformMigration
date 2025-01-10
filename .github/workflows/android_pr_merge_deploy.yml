@@ -5,8 +5,8 @@ name: Android PR Merge Deploy
 #    types: [closed]
 
 on:
-  pull_request:
-      branches: [ "main" ]
+#  pull_request:
+#      branches: [ "main" ]
 
 permissions:
   contents: write # to fetch code (actions/checkout), push tag
