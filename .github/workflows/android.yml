@@ -53,9 +53,9 @@ jobs:
           echo -e "Version name is: \n ${{ steps.set-output.outputs.mobile_version_name }}"
           echo -e "Version code is: \n ${{ steps.set-output.outputs.mobile_version_code }}"
           
-          echo -e "major is: \n ${{ major }}"
-          echo -e "minor is: \n ${{ minor }}"
-          echo -e "patch is: \n ${{ patch }}"
+          echo -e "major is: \n ${{ steps.set-output.outputs.major }}"
+          echo -e "minor is: \n ${{ steps.set-output.outputs.minor }}"
+          echo -e "patch is: \n ${{ steps.set-output.outputs.patch }}"
 
       - name: set up JDK 17
         uses: actions/setup-java@v4
