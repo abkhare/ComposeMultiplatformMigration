@@ -45,17 +45,16 @@ jobs:
           echo "mobile_version_name=${{ steps.bump-semver.outputs.new_version }}" >> $GITHUB_OUTPUT
 
           IFS='.' read -r major minor patch <<< "${{ steps.bump-semver.outputs.new_version }}"
-          mobile_version_code=$((major * 10000 + minor * 100 + patch))
-
+          major_version = $((major * 10))
+          minor_version = $((minor * 10))
+          patch_version = $((patch * 10))
+          mobile_version_code=${{major_version}}${{minor_version}}${{patch_version}}
+          
           echo "mobile_version_code=${mobile_version_code}" >> $GITHUB_OUTPUT
       - name: "Print output"
         run: |
           echo -e "Version name is: \n ${{ steps.set-output.outputs.mobile_version_name }}"
           echo -e "Version code is: \n ${{ steps.set-output.outputs.mobile_version_code }}"
-          
-          echo -e "major is: \n ${{ steps.set-output.outputs.major }}"
-          echo -e "minor is: \n ${{ steps.set-output.outputs.minor }}"
-          echo -e "patch is: \n ${{ steps.set-output.outputs.patch }}"
 
       - name: set up JDK 17
         uses: actions/setup-java@v4
