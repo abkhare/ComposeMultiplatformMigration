@@ -87,3 +87,12 @@ jobs:
           asset_path: app/build/outputs/apk/debug/app-debug.apk
           asset_name: andoid-artifact-${{ steps.set-output.outputs.mobile_version_name }}.apk
           asset_content_type: application/zip
+
+      - name: "Upload to Google Play"
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.abhi.dynamicfeatures.ondemand
+          releaseFiles: app/build/outputs/apk/debug/app-debug.apk
+          track: qa
+          status: completed
