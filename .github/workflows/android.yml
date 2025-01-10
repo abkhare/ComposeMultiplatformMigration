@@ -45,9 +45,9 @@ jobs:
           echo "mobile_version_name=${{ steps.bump-semver.outputs.new_version }}" >> $GITHUB_OUTPUT
 
           IFS='.' read -r major minor patch <<< "${{ steps.bump-semver.outputs.new_version }}"
-          major_version = $((major * 10))
-          minor_version = $((minor * 10))
-          patch_version = $((patch * 10))
+          major_version=$((major * 10))
+          minor_version=$((minor * 10))
+          patch_version=$((patch * 10))
           mobile_version_code=${{major_version}}${{minor_version}}${{patch_version}}
           
           echo "mobile_version_code=${mobile_version_code}" >> $GITHUB_OUTPUT
