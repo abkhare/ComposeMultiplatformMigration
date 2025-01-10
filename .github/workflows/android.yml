@@ -130,6 +130,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          token: ${{ secrets.PAT_TOKEN }}
+          submodules: true
+          recursive: true
           fetch-depth: 0
       - name: Set env
         id: last_tag
