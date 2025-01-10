@@ -116,23 +116,29 @@
 name: Android Deploy
 
 on:
-  push:
-    branches: [ "feature/workflows" ]
-  pull_request:
-      branches: [ "feature/workflows" ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version Name'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 permissions:
   contents: write # to fetch code (actions/checkout), push tag
 
 jobs:
-  prepare_deploy:
+  android_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_TOKEN }}
           submodules: true
-          recursive: true
           fetch-depth: 0
       - name: Set env
         id: last_tag
@@ -142,7 +148,7 @@ jobs:
         with:
           current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
           # A semver update level {major, minor, patch}.
-          level: patch
+          level: ${{ github.event.inputs.version }}
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
