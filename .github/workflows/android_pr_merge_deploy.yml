@@ -28,7 +28,7 @@ jobs:
         with:
           current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
           # A semver update level {major, minor, patch}.
-          level: ${{ github.event.inputs.version }}
+          level: patch
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
