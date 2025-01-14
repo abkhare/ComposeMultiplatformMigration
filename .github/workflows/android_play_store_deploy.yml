@@ -67,28 +67,19 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew :app:assembleRelease
+        run: ./gradlew :app:bundleRelease
 
       - uses: r0adkll/sign-android-release@v1
         name: "Sign app aab file"
         id: sign_app
         with:
-          releaseDirectory: app/build/outputs/apk/release
+          releaseDirectory: app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
           alias: ${{ secrets.ANDROID_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
         env:
           BUILD_TOOLS_VERSION: "30.0.2"
-
-#      - name: "Upload to Google Play"
-#        uses: r0adkll/upload-google-play@v1
-#        with:
-#          serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
-#          packageName: 'com.abkhare.multiplatformmigration'
-#          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
-#          track: alpha
-#          status: completed
 
       - name: GitHub Release
         id: create_release
@@ -110,6 +101,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: app/build/outputs/apk/release/app-release.apk
-          asset_name: andoid-artifact-${{ steps.set-output.outputs.mobile_version_name }}.apk
+          asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          asset_name: andoid-artifact-${{ steps.set-output.outputs.mobile_version_name }}.aab
           asset_content_type: application/zip
+
+      - name: "Upload to Google Play"
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
+          packageName: 'com.abkhare.multiplatformmigration'
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: alpha
+          status: completed
