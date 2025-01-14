@@ -14,7 +14,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.abkhare.mtion"
+        applicationId = "com.abkhare.multiplatformmigration"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
