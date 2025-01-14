@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.abkhare.mtion"
+    namespace = "com.abkhare.multiplatformmigration"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.abkhare.multiplatformmigration"
+        applicationId = "com.abkhare.mtion"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
