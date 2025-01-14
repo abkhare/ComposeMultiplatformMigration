@@ -67,25 +67,49 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew :app:bundleRelease
+        run: ./gradlew :app:assembleRelease
 
-      - uses: r0adkll/sign-android-release@v1
-        name: "Sign app aab file"
-        id: sign_app
+#      - uses: r0adkll/sign-android-release@v1
+#        name: "Sign app aab file"
+#        id: sign_app
+#        with:
+#          releaseDirectory: app/build/outputs/bundle/release
+#          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
+#          alias: ${{ secrets.ANDROID_ALIAS }}
+#          keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
+#          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+#        env:
+#          BUILD_TOOLS_VERSION: "30.0.2"
+#
+#      - name: "Upload to Google Play"
+#        uses: r0adkll/upload-google-play@v1
+#        with:
+#          serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
+#          packageName: 'com.abkhare.multiplatformmigration'
+#          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+#          track: alpha
+#          status: completed
+
+      - name: GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          releaseDirectory: app/build/outputs/bundle/release
-          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
-          alias: ${{ secrets.ANDROID_ALIAS }}
-          keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          tag_name: ${{ steps.set-output.outputs.mobile_version_name }}
+          release_name: Android PR Release ${{ steps.set-output.outputs.mobile_version_name }}
+          body: |
+            ${{ github.event.pull_request.body }}
+          draft: false
+          prerelease: false
         env:
-          BUILD_TOOLS_VERSION: "30.0.2"
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: "Upload to Google Play"
-        uses: r0adkll/upload-google-play@v1
+      - name: Upload Release APK
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
-          packageName: 'com.abkhare.multiplatformmigration'
-          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: alpha
-          status: completed
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: app/build/outputs/apk/release/app-release.apk
+          asset_name: andoid-artifact-${{ steps.set-output.outputs.mobile_version_name }}.apk
+          asset_content_type: application/zip
