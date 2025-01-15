@@ -5,8 +5,8 @@ name: Android PR Merge Deploy
 #    types: [closed]
 
 on:
-#  pull_request:
-#      branches: [ "main" ]
+  pull_request:
+      branches: [ "main" ]
 
 permissions:
   contents: write # to fetch code (actions/checkout), push tag
@@ -41,7 +41,7 @@ jobs:
           echo "mobile_version_name=${{ steps.bump-semver.outputs.new_version }}" >> $GITHUB_OUTPUT
 
           IFS='.' read -r major minor patch <<< "${{ steps.bump-semver.outputs.new_version }}"
-          mobile_version_code=$((major * 10000 + minor * 100 + patch))
+          mobile_version_code=$((major))$((minor))$((patch))
 
           echo "mobile_version_code=${mobile_version_code}" >> $GITHUB_OUTPUT
       - name: "Print output"
