@@ -1,0 +1,92 @@
+name: Android Play Store Deploy
+
+#on:
+#  workflow_dispatch:
+#    inputs:
+#      version:
+#        description: 'Version Name'
+#        required: true
+#        default: 'patch'
+#        type: choice
+#        options:
+#          - major
+#          - minor
+#          - patch
+
+#on:
+#  pull_request:
+#    branches: [ "main" ]
+
+permissions:
+  contents: write # to fetch code (actions/checkout), push tag
+
+jobs:
+  android_play_store_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          submodules: true
+          fetch-depth: 0
+      - name: Set env
+        id: last_tag
+        run: echo "LAST_TAG=$(git tag --sort=committerdate | tail -1)" >> $GITHUB_OUTPUT
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        with:
+          current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
+          # A semver update level {major, minor, patch}.
+          level: patch #${{ github.event.inputs.version }}
+      - run: |
+          git config user.name abkhare
+          git config user.email abhiraj.khare100@gmail.com
+          git tag ${{ steps.bump-semver.outputs.new_version }}
+          git push --tags
+      - name: "Set output"
+        id: set-output
+        run: |
+          echo "mobile_version_name=${{ steps.bump-semver.outputs.new_version }}" >> $GITHUB_OUTPUT
+
+          IFS='.' read -r major minor patch <<< "${{ steps.bump-semver.outputs.new_version }}"
+          mobile_version_code=$((major * 10000 + minor * 100 + patch))
+
+          echo "mobile_version_code=${mobile_version_code}" >> $GITHUB_OUTPUT
+      - name: "Print output"
+        run: |
+          echo -e "Version name is: \n ${{ steps.set-output.outputs.mobile_version_name }}"
+          echo -e "Version code is: \n ${{ steps.set-output.outputs.mobile_version_code }}"
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew :app:bundleRelease
+
+      - uses: r0adkll/sign-android-release@v1
+        name: "Sign app aab file"
+        id: sign_app
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
+          alias: ${{ secrets.ANDROID_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "30.0.2"
+
+      - name: "Upload to Google Play"
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.abkhare.multiplatformmigration
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          # alpha, beta, production
+          track: internal
+          status: draft
