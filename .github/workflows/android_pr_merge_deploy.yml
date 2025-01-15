@@ -1,23 +1,18 @@
-name: Android Deploy
+name: Android PR Merge Deploy
+
+#on:
+#  pull_request:
+#    types: [closed]
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version Name'
-        required: true
-        default: 'patch'
-        type: choice
-        options:
-          - major
-          - minor
-          - patch
+  pull_request:
+      branches: [ "main" ]
 
 permissions:
   contents: write # to fetch code (actions/checkout), push tag
 
 jobs:
-  android_deploy:
+  android_pr_merge_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,13 +22,14 @@ jobs:
           fetch-depth: 0
       - name: Set env
         id: last_tag
-        run: echo "LAST_TAG=$(git tag --sort=committerdate | tail -1)" >> $GITHUB_OUTPUT
+        run: |
+          echo "LAST_TAG=$(git tag --sort=committerdate | tail -1)" >> $GITHUB_OUTPUT
       - uses: actions-ecosystem/action-bump-semver@v1
         id: bump-semver
         with:
           current_version: ${{ steps.last_tag.outputs.LAST_TAG }}
           # A semver update level {major, minor, patch}.
-          level: ${{ github.event.inputs.version }}
+          level: patch
       - run: |
           git config user.name abkhare
           git config user.email abhiraj.khare100@gmail.com
@@ -45,7 +41,7 @@ jobs:
           echo "mobile_version_name=${{ steps.bump-semver.outputs.new_version }}" >> $GITHUB_OUTPUT
 
           IFS='.' read -r major minor patch <<< "${{ steps.bump-semver.outputs.new_version }}"
-          mobile_version_code=$((major * 10000 + minor * 100 + patch))
+          mobile_version_code=$((major))$((minor))$((patch))
 
           echo "mobile_version_code=${mobile_version_code}" >> $GITHUB_OUTPUT
       - name: "Print output"
@@ -60,6 +56,17 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Setup Gradle Cache
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+      - name: Bump Version Code
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: app/build.gradle.kts
+          versionCode: ${{ steps.set-output.outputs.mobile_version_code }}
+          versionName: ${{ steps.set-output.outputs.mobile_version_name }}
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
@@ -70,11 +77,9 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: ${{ steps.set-output.outputs.mobile_version_name }}
-          release_name: Android Release .${{ steps.set-output.outputs.mobile_version_name }}
+          release_name: Android PR Release ${{ steps.set-output.outputs.mobile_version_name }}
           body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+            ${{ github.event.pull_request.body }}
           draft: false
           prerelease: false
         env:
@@ -88,5 +93,6 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: app/build/outputs/apk/debug/app-debug.apk
-          asset_name: signed-artifact.apk
+          asset_name: andoid-artifact-${{ steps.set-output.outputs.mobile_version_name }}.apk
           asset_content_type: application/zip
+
