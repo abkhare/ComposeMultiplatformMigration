@@ -87,6 +87,6 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_DEPLOY_SERVICE_ACCOUNT_JSON }}
           packageName: com.abkhare.multiplatformmigration
           releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
-          # alpha, beta,
+          # alpha, beta, production
           track: internal
           status: draft
