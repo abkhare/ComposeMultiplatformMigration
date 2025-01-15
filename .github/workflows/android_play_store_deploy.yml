@@ -112,4 +112,4 @@ jobs:
           packageName: com.abkhare.multiplatformmigration
           releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
           track: alpha
-          status: completed
+          status: draft
